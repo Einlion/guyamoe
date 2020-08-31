@@ -999,6 +999,7 @@ function UI_Dropdown(o) {
 	this.el = -1; //keeps the track for scrolling through element
 
 	this.init = (crr, silent) => { 
+		this.dropdown.style.height = "unset"
 		this.dropdown.innerHTML = '';
 		for(let i=0; i < crr.length; i++) {
 			this.dropdown.insertAdjacentHTML('beforeend', `<a class="opts">${crr[i]}</a>`)
@@ -1006,8 +1007,9 @@ function UI_Dropdown(o) {
 		if(silent) this.input.value = o.setting.get();
 		else this.dropdown.classList.remove('hidden');
 		if(this.disabled) this.input.setAttribute('readonly', '');
+		this.adjustHeight();
 	}
-	
+
 	this.get = () => this.value;
 	this.set = function(value) {
 		this.value = this.input.value = value;
@@ -1034,6 +1036,7 @@ function UI_Dropdown(o) {
 			this.input.value = ''
 			this.input.placeholder = this.dropdown.childNodes[this.el].textContent;
 			this.disabled = true;
+			this.dropdown.scrollTop = this.dropdown.childNodes[this.el].offsetTop;
 		}
 
 		if(e.key == 'ArrowUp') {
@@ -1048,6 +1051,7 @@ function UI_Dropdown(o) {
 			this.input.value = ''
 			this.input.placeholder = this.dropdown.childNodes[this.el].textContent;
 			this.disabled = true;
+			this.dropdown.scrollTop = this.dropdown.childNodes[this.el].offsetTop;
 		}
 	}
 
@@ -1083,6 +1087,13 @@ function UI_Dropdown(o) {
 		}.bind(this));
 	}
 
+	this.adjustHeight = (e) => {
+		this.dropdown.style.height = "unset";
+		if (window.innerHeight - this.dropdown.getBoundingClientRect().bottom < 0) this.dropdown.style.height = 35*this.options.length + (window.innerHeight - this.dropdown.getBoundingClientRect().bottom) - 8 + "px"; 
+	}
+
+	window.onresize = this.adjustHeight;	
+
 	this.dropdown.onclick = (e) => {
 		if(e.target.className === 'opts') {
 			this.dropdown.classList.add('hidden');
@@ -1091,7 +1102,7 @@ function UI_Dropdown(o) {
 			this.SeI.send();
 		}
 	}
-	this.dropdown.setAttribute("tabindex", "-1")
+	this.dropdown.setAttribute("tabindex", "-1");
 }
 
 function UI_ColorPicker(o) {
